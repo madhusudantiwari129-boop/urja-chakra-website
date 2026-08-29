@@ -135,7 +135,7 @@ const initialTransactions: Transaction[] = [
   { title: "Verified Energy Saving", amount: "+24 UEC", date: "12 Jun · 11:08", positive: true },
 ];
 
-const EXACT_LOGO_URL = "https://customer-assets-wrfwihn1.emergentagent.net/job_verified-savings-app/artifacts/gmul3mcn_image.png";
+const EXACT_LOGO_URL = "https://customer-assets-wrfwihn1.emergentagent.net/job_verified-savings-app/artifacts/w26ga0fs_image.png";
 
 function formatLakhs(value: number) {
   return `₹${(value / 100000).toFixed(2)}L`;
