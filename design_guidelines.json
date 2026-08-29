@@ -1,0 +1,87 @@
+{
+  "theme": "dark",
+  "theme_description": "High-End Dark Mode Technical. Focuses on premium energy analytics SaaS aesthetic. Uses deep obsidian/slate backgrounds with vibrant, electric green accents (representing energy, savings, and sustainability). Minimalist glassmorphism for floating elements, high contrast for data legibility.",
+  "typography": {
+    "headings": {
+      "font": "Outfit",
+      "import_url": "https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap",
+      "style": "tracking-tight, bold, expressive. Never use Inter for headings."
+    },
+    "body": {
+      "font": "IBM Plex Sans",
+      "import_url": "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap",
+      "style": "Clean, highly readable, structured."
+    }
+  },
+  "colors": {
+    "background": {
+      "primary": "#0A0A0A",
+      "secondary": "#121212",
+      "tertiary": "#1E293B"
+    },
+    "accent": {
+      "primary": "#10B981", 
+      "neon_glow": "#00FF66",
+      "warning": "#F59E0B",
+      "danger": "#EF4444",
+      "wallet_balance": "#34D399"
+    },
+    "text": {
+      "primary": "#F8FAFC",
+      "secondary": "#94A3B8",
+      "muted": "#64748B"
+    },
+    "forbidden_colors": ["#7351B7", "#1B93A4"]
+  },
+  "layouts": {
+    "container": "Max-width 7xl, massive padding (p-8 to p-24) to let the design breathe.",
+    "hero": "Asymmetrical Grid. Left side: 60% width with large dynamic typography (Account for every watt). Right side: 40% width featuring the 3D rotating URJA-CHAKRA logo placeholder and glowing animated energy flow.",
+    "dashboard_demo": "Dense Bento Grid (Mode B). Tight gaps (gap-4). Cards with 1px border-white/10 and subtle glassmorphism (bg-white/5).",
+    "solution_flow": "Circular or staggered horizontal timeline utilizing Framer Motion to draw lines and animate 'energy pulses' between steps."
+  },
+  "components_to_use": {
+    "UI": "Shadcn UI (Card, Button, Tabs, Table, Dialog, Badge, ScrollArea). Heavily customize to remove standard 'Vercel' look (use darker backgrounds, colored neon borders on hover).",
+    "Charts": "Recharts for Actual vs Baseline graphs and Anomaly spike graphs in the Demo and Tech sections.",
+    "Icons": "lucide-react for standard UI, @phosphor-icons/react for high-end duotone elements.",
+    "Animation": "framer-motion for page reveals, energy flows, and UI transitions.",
+    "3D": "@react-three/fiber and @react-three/drei for the 3D rotating logo placeholder."
+  },
+  "visual_enhancers": {
+    "glassmorphism": "Use backdrop-blur-xl bg-white/5 border border-white/10 for sticky headers and dashboard cards.",
+    "glow_effects": "Use drop-shadow-[0_0_15px_rgba(16,185,129,0.5)] on key elements like UEC values, Wallet balance, and primary CTA buttons.",
+    "tracing_beam": "Implement animated gradient borders for the 'Investigate' anomaly card to draw attention."
+  },
+  "images": {
+    "hero_background": {
+      "url": "https://images.unsplash.com/photo-1513295202663-54cd69dd2b43?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzB8MHwxfHNlYXJjaHwzfHxmYWN0b3J5JTIwaW5kdXN0cmlhbCUyMGJhY2tncm91bmR8ZW58MHx8fHwxNzg4MDM1MjEzfDA&ixlib=rb-4.1.0&q=85",
+      "description": "Landscape factory background. Use with heavy dark overlay (bg-black/70) or gradient mask to provide deep industrial context without overwhelming the UI."
+    },
+    "demo_context": {
+      "url": "https://images.unsplash.com/photo-1776090188315-c481a5753867?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1OTN8MHwxfHNlYXJjaHwyfHxzdGVlbCUyMHJvbGxpbmclMjBtaWxsJTIwaW50ZXJpb3J8ZW58MHx8fHwxNzg4MDM1MjEzfDA&ixlib=rb-4.1.0&q=85",
+      "description": "Steel rolling mill interior for Sharma Steel Rolling Mills dashboard header or background."
+    },
+    "impact_section": {
+      "url": "https://images.unsplash.com/photo-1595437193398-f24279553f4f?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzl8MHwxfHNlYXJjaHwxfHxzdXN0YWluYWJsZSUyMGVuZXJneSUyMHNvbGFyJTIwd2luZHxlbnwwfHx8fDE3ODgwMzUyMTN8MA&ixlib=rb-4.1.0&q=85",
+      "description": "Wind turbine on a building, representing sustainable energy and reinvestment."
+    }
+  },
+  "specific_section_instructions": {
+    "Hero": "Must feature 'Account for every watt.' Prominent 'Launch Interactive Demo' button. Create a sophisticated Right side layout where an animated flow shows Factory -> Smart Meter -> Energy Analytics -> Verified Savings -> UEC -> Green Wallet. In the same view, integrate a R3F Canvas showing a 3D rotating metallic/glass coin or ring labeled 'URJA-CHAKRA' and 'ऊर्जा चक्र' with a green glow.",
+    "Demo": "Simulate the state exactly as requested: 'Sharma Steel Rolling Mills'. Show anomaly 'Line 2 compressor 34% above baseline'. Button to 'Investigate' which expands the anomaly details. Button to 'Implement Improvement' which triggers a deterministic sequence: energy drops, 'energy saving verified', UEC goes up by 12, Wallet updates to ₹1.28L. Must use React state to handle this simulation.",
+    "Technology": "Show 5 layers: EDGE, INGEST, STORE, INTELLIGENCE, APPLICATION. Make them hoverable cards that reveal their purpose.",
+    "Branding": "Use 'URJA-CHAKRA' and 'ऊर्जा चक्र' everywhere exactly as specified. Do NOT alter the Hindi spelling."
+  },
+  "accessibility": {
+    "contrast": "Ensure all text against dark backgrounds has at least a 4.5:1 ratio.",
+    "motion": "Respect prefers-reduced-motion for the 3D logo and continuous energy flow animations.",
+    "testing": "All key interactive elements (Demo buttons, Nav links, Investigate buttons) MUST have data-testid attributes."
+  },
+  "UNIVERSAL_GUIDELINES_FOR_MAIN_AGENT": [
+    "You tend to converge toward generic outputs. Break the mold: use radical asymmetrical layouts for marketing sections.",
+    "Do NOT apply global 'transition: all'. Use targeted transitions.",
+    "NEVER center-align entire containers (no text-align: center on App).",
+    "Use 2-3x more spacing than usual. Let elements breathe (py-24, gap-12).",
+    "Ensure the Demo section looks like a distinct, high-end SaaS embedded inside the marketing page. Use smaller fonts, tighter grids, and real-looking mock data.",
+    "Implement the 3D Logo using `@react-three/fiber`, `@react-three/drei` (e.g., using a rotating `Torus` or `Cylinder` with `Text` applied, styled beautifully with meshPhysicalMaterial, metalness, roughness, and glowing lights)."
+  ]
+}
