@@ -9,6 +9,7 @@ Single-page SIH 2026 concept website for URJA-CHAKRA (ऊर्जा चक्�
 - Investigate Line 2 compressor anomaly, implement improvement, then update consumption, verified savings, UEC and wallet state.
 - Green Wallet transaction history updates from verified savings and simulated marketplace buy/sell actions.
 - Solution loop, six method steps, architecture layers, AI signal modes and recommendation sorting are interactive.
+- Launch Demo opens a dedicated command-center screen at `/demo` with functional workspace navigation, telemetry range controls, simulate-saving action, alert investigation, machinery, target, improvement, wallet, marketplace, report and facility-profile views.
 
 ## Data model
 - Demo state: energySaved, uecEarned, walletUec, walletValue, improvementApplied.

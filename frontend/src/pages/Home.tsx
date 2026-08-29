@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Activity,
   ArrowDownRight,
@@ -170,6 +171,7 @@ function LogoPlaceholder({ small = false }: { small?: boolean }) {
 }
 
 function Home() {
+  const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeStep, setActiveStep] = useState(0);
   const [activeFlow, setActiveFlow] = useState(0);
@@ -231,7 +233,7 @@ function Home() {
             const id = item.toLowerCase().replaceAll(" ", "-");
             return <a href={`#${id}`} key={item} data-testid={`nav-link-${id}`} onClick={() => setMenuOpen(false)}>{item}</a>;
           })}
-          <Button className="header-demo-button" onClick={() => { scrollToId("demo"); setMenuOpen(false); }} data-testid="header-launch-demo-button">Launch Demo <ArrowRight size={15} /></Button>
+          <Button className="header-demo-button" onClick={() => { navigate("/demo"); setMenuOpen(false); }} data-testid="header-launch-demo-button">Launch Demo <ArrowRight size={15} /></Button>
         </nav>
         <Button variant="ghost" size="icon" className="mobile-menu-button" onClick={() => setMenuOpen((open) => !open)} aria-label="Toggle navigation" data-testid="mobile-menu-toggle">{menuOpen ? <X /> : <Menu />}</Button>
       </header>
@@ -243,7 +245,7 @@ function Home() {
             <h1 data-testid="hero-title">Account for <em>every</em> watt.</h1>
             <p className="hero-lede" data-testid="hero-description">URJA-CHAKRA is a unified energy accounting platform that transforms verified electricity savings into tradable energy credits.</p>
             <div className="hero-actions" data-testid="hero-actions">
-              <Button className="primary-cta" onClick={() => scrollToId("demo")} data-testid="hero-launch-demo-button">Launch Interactive Demo <ArrowRight size={17} /></Button>
+              <Button className="primary-cta" onClick={() => navigate("/demo")} data-testid="hero-launch-demo-button">Launch Interactive Demo <ArrowRight size={17} /></Button>
               <Button variant="outline" className="secondary-cta" onClick={() => scrollToId("solution")} data-testid="hero-explore-solution-button">Explore the Solution <MoveUpRight size={16} /></Button>
             </div>
             <div className="hero-proof" data-testid="hero-proof-points"><span>Measure.</span><span>Save.</span><span>Verify.</span><span>Earn.</span><span>Reinvest.</span></div>
@@ -331,7 +333,7 @@ function Home() {
 
       <section id="about" className="section-shell future-section" data-testid="about-section"><div className="section-topline"><span>11 / Future expansion</span><span>Start focused. Scale intentionally.</span></div><SectionHeading eyebrow="Future Expansion" title="A common language for every place energy moves." copy="Begin where the signal is clear, then expand the registry as more facilities and use cases connect to the same value loop." /><div className="future-timeline" data-testid="future-timeline">{[{ phase: "PHASE 1", title: "Manufacturing & MSMEs" }, { phase: "PHASE 2", title: "Commercial Buildings" }, { phase: "PHASE 3", title: "Institutional Campuses" }, { phase: "PHASE 4", title: "Cold Chain / Warehousing / Data Centres" }, { phase: "PHASE 5", title: "Housing Societies & Agriculture" }, { phase: "FUTURE", title: "Interoperability with carbon-credit systems" }].map(({ phase, title }, index) => <div className="future-node" key={phase} data-testid={`future-phase-${index}`}><span>{phase}</span><i /><strong>{title}</strong></div>)}</div></section>
 
-      <section className="closing-section" data-testid="final-cta"><div className="closing-orb" /><div className="section-shell closing-inner"><span className="mini-kicker">THE NEXT UNIT COUNTS</span><h2>Every unit saved<br /><em>should count.</em></h2><p>Measure energy. Reduce waste. Earn value. Build a cleaner future.</p><Button className="primary-cta" onClick={() => scrollToId("demo")} data-testid="final-launch-demo-button">Launch URJA-CHAKRA Demo <ArrowRight size={17} /></Button></div></section>
+      <section className="closing-section" data-testid="final-cta"><div className="closing-orb" /><div className="section-shell closing-inner"><span className="mini-kicker">THE NEXT UNIT COUNTS</span><h2>Every unit saved<br /><em>should count.</em></h2><p>Measure energy. Reduce waste. Earn value. Build a cleaner future.</p><Button className="primary-cta" onClick={() => navigate("/demo")} data-testid="final-launch-demo-button">Launch URJA-CHAKRA Demo <ArrowRight size={17} /></Button></div></section>
 
       <footer className="site-footer" data-testid="site-footer"><div className="footer-main"><div><LogoPlaceholder small /><p>Unified Registry for Joule Accounting</p><span className="footer-event">Smart India Hackathon 2026</span></div><div className="footer-links"><span>Explore</span><a href="#home" data-testid="footer-home-link">Home</a><a href="#solution" data-testid="footer-solution-link">Solution</a><a href="#technology" data-testid="footer-technology-link">Technology</a><a href="#impact" data-testid="footer-impact-link">Impact</a><a href="#demo" data-testid="footer-demo-link">Demo</a></div><div className="footer-note"><Globe2 size={17} /><span>Account for every watt.</span><small>Prototype concept · mock/demo data</small></div></div><div className="footer-bottom"><span>© 2026 URJA-CHAKRA</span><span>ऊर्जा चक्र</span><span>Built for a cleaner, more accountable energy future.</span></div></footer>
     </main>
