@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   Activity,
@@ -18,6 +18,7 @@ import {
   Gauge,
   LayoutDashboard,
   MoreHorizontal,
+  Play,
   Search,
   Settings2,
   ShoppingCart,
@@ -25,6 +26,7 @@ import {
   Sparkles,
   Target,
   WalletCards,
+  X,
   Zap,
 } from "lucide-react";
 import {
@@ -59,6 +61,12 @@ const navItems: NavItem[] = [
   { label: "Marketplace", icon: ShoppingCart },
   { label: "Reports", icon: FileText },
   { label: "Facility Profile", icon: Building2 },
+];
+
+const presenterSteps = [
+  { label: "01 / Alert", title: "Start with the waste signal", copy: "Open the alert center first. The compressor is drawing 34% above its expected baseline — a clear, actionable reason to investigate." },
+  { label: "02 / Action", title: "Simulate the saving", copy: "The walkthrough now runs the recommended intervention. Consumption drops and the verified saving moves into the evidence trail." },
+  { label: "03 / Value", title: "Show verified UEC", copy: "Close on the proof: +12 UEC is now visible in the Credits Earned card and the Green Wallet is ready to reinvest." },
 ];
 
 const telemetry = [
@@ -110,6 +118,8 @@ function Demo() {
   const [toast, setToast] = useState("Data synced");
   const [reportGenerated, setReportGenerated] = useState(false);
   const [profileEditing, setProfileEditing] = useState(false);
+  const [presenterMode, setPresenterMode] = useState(false);
+  const [presenterStep, setPresenterStep] = useState(0);
 
   const dailyConsumption = simulated ? "4,112 kWh" : "4,508 kWh";
   const monthlyConsumption = simulated ? "121.6 MWh" : "126.8 MWh";
@@ -142,10 +152,41 @@ function Demo() {
     setToast(`${view} view opened`);
   };
 
+  const startPresenterMode = () => {
+    setPresenterStep(0);
+    setPresenterMode(true);
+    selectView("Alerts");
+    setToast("Presenter mode started · alert signal ready");
+  };
+
+  const advancePresenter = () => {
+    if (presenterStep >= presenterSteps.length - 1) {
+      setPresenterMode(false);
+      setToast("Presenter mode complete · demo ready");
+      return;
+    }
+    setPresenterStep((value) => value + 1);
+  };
+
+  useEffect(() => {
+    if (!presenterMode) return;
+    if (presenterStep === 0) selectView("Alerts");
+    if (presenterStep === 1) {
+      selectView("Dashboard");
+      if (!simulated) simulateSaving();
+    }
+    if (presenterStep === 2) selectView("Dashboard");
+    const timer = window.setTimeout(() => {
+      if (presenterStep < presenterSteps.length - 1) setPresenterStep((value) => value + 1);
+      else setPresenterMode(false);
+    }, 5200);
+    return () => window.clearTimeout(timer);
+  }, [presenterMode, presenterStep]);
+
   const renderMetric = (label: string, value: string, note: string, icon: IconType, tone: string, index: number) => {
     const MetricIcon = icon;
     return (
-      <div className={`command-metric command-metric-${tone}`} data-testid={`command-metric-${index}`}>
+      <div className={`command-metric command-metric-${tone} ${presenterMode && presenterStep === 2 && index === 2 ? "presenter-highlight" : ""}`} data-testid={`command-metric-${index}`}>
         <div className="command-metric-top"><span className="command-metric-icon"><MetricIcon size={17} /></span><button onClick={() => setToast(`${label} options opened`)} aria-label={`${label} options`} data-testid={`command-metric-options-${index}`}><MoreHorizontal size={18} /></button></div>
         <span className="command-metric-label">{label}</span>
         <strong>{value}</strong>
@@ -180,7 +221,7 @@ function Demo() {
 
   const renderImprovements = () => <section className="command-view-panel" data-testid="improvements-view"><div className="view-heading"><div><span className="command-kicker">ACTION QUEUE</span><h3>Where can Sharma Steel save?</h3><p>Prioritised actions ranked by expected savings and payback.</p></div><button className="command-outline-button" onClick={() => setToast("Recommendation list refreshed")} data-testid="refresh-improvements-button"><Activity size={15} /> Refresh queue</button></div><div className="improvement-view-grid">{[{ title: "Compressed-Air Leak", saving: "9,100 kWh/yr", payback: "2 months", tone: "high" }, { title: "IE4 Motor Upgrade", saving: "18,400 kWh/yr", payback: "11 months", tone: "strategic" }, { title: "Off-Peak Furnace Preheat", saving: "6,750 kWh/yr", payback: "Immediate", tone: "quick" }].map((item, index) => <div className="improvement-view-card" key={item.title} data-testid={`improvement-view-card-${index}`}><span className={`improvement-label ${item.tone}`}>{item.tone === "quick" ? "Quick win" : item.tone === "high" ? "High impact" : "Strategic"}</span><h4>{item.title}</h4><strong>{item.saving}</strong><small>Estimated payback · {item.payback}</small><button onClick={simulateSaving} data-testid={`improvement-apply-${index}`}>Implement improvement <ArrowRight size={14} /></button></div>)}</div></section>;
 
-  const renderAlerts = () => <section className="command-view-panel" data-testid="alerts-view"><div className="view-heading"><div><span className="command-kicker">ALERT CENTER</span><h3>Signals that need attention</h3><p>Review exceptions before they become monthly surprises.</p></div><span className="alert-count-chip"><CircleAlert size={14} /> 1 open alert</span></div><div className="alert-detail-card"><div className="alert-detail-icon"><AlertTriangle size={22} /></div><div><span className="command-kicker">HIGH PRIORITY · LINE 2</span><h4>Compressor drawing 34% above baseline</h4><p>Potential compressed-air leak detected from machine-aware comparison. Current load 76 kW vs expected load 42 kW.</p><div className="alert-detail-actions"><button onClick={() => { setActiveMachine("Compressor Line 2"); setToast("Compressor Line 2 investigation opened"); }} data-testid="alert-investigate-button">Investigate machine <ArrowRight size={14} /></button><button className="command-text-button" onClick={() => { setToast("Alert marked as reviewed"); selectView("Dashboard"); }} data-testid="alert-resolve-button">Mark reviewed <Check size={14} /></button></div></div></div></section>;
+  const renderAlerts = () => <section className={`command-view-panel ${presenterMode && presenterStep === 0 ? "presenter-highlight" : ""}`} data-testid="alerts-view"><div className="view-heading"><div><span className="command-kicker">ALERT CENTER</span><h3>Signals that need attention</h3><p>Review exceptions before they become monthly surprises.</p></div><span className="alert-count-chip"><CircleAlert size={14} /> 1 open alert</span></div><div className="alert-detail-card"><div className="alert-detail-icon"><AlertTriangle size={22} /></div><div><span className="command-kicker">HIGH PRIORITY · LINE 2</span><h4>Compressor drawing 34% above baseline</h4><p>Potential compressed-air leak detected from machine-aware comparison. Current load 76 kW vs expected load 42 kW.</p><div className="alert-detail-actions"><button onClick={() => { setActiveMachine("Compressor Line 2"); setToast("Compressor Line 2 investigation opened"); }} data-testid="alert-investigate-button">Investigate machine <ArrowRight size={14} /></button><button className="command-text-button" onClick={() => { setToast("Alert marked as reviewed"); selectView("Dashboard"); }} data-testid="alert-resolve-button">Mark reviewed <Check size={14} /></button></div></div></div></section>;
 
   const renderWallet = () => <section className="command-view-panel" data-testid="wallet-view"><div className="view-heading"><div><span className="command-kicker">CREDIT WALLET</span><h3>Green capital, ready to reinvest.</h3><p>Verified savings and credit trades settle into one facility balance.</p></div><button className="command-outline-button" onClick={() => selectView("Marketplace")} data-testid="wallet-open-marketplace-button"><ShoppingCart size={15} /> Open marketplace</button></div><div className="wallet-view-grid"><div className="wallet-view-balance"><span>GREEN CAPEX BALANCE</span><strong>{formatLakhs(walletBalance)}</strong><small>{walletUec} UEC available</small><button onClick={simulateSaving} data-testid="wallet-verify-saving-button">Verify next saving <ArrowUpRight size={14} /></button></div><div className="wallet-view-history"><span className="command-kicker">RECENT ACTIVITY</span>{walletTransactions.map((transaction, index) => <div className="wallet-view-row" key={`${transaction.title}-${index}`} data-testid={`wallet-activity-${index}`}><span className={transaction.positive ? "wallet-arrow positive" : "wallet-arrow negative"}>{transaction.positive ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}</span><span><strong>{transaction.title}</strong><small>{transaction.meta}</small></span><b className={transaction.positive ? "positive-text" : "negative-text"}>{transaction.amount}</b></div>)}</div></div></section>;
 
@@ -202,6 +243,8 @@ function Demo() {
     return renderProfile();
   };
 
+  const presenterCard = presenterSteps[presenterStep];
+
   return (
     <main className="command-shell" data-testid="command-center-screen">
       <aside className="command-sidebar" data-testid="command-sidebar">
@@ -211,9 +254,10 @@ function Demo() {
         <div className="sidebar-bottom"><button className="command-facility-switcher" onClick={() => setToast("Facility switcher opened")} data-testid="facility-switcher"><span className="facility-switcher-icon"><Building2 size={18} /></span><span><strong>Sharma Steel</strong><small>UDYAM-RJ-17-0043291</small></span><MoreHorizontal size={16} /></button><button className="command-profile" onClick={() => setProfileOpen((value) => !value)} data-testid="command-profile-menu"><span className="profile-avatar">SS</span><span><strong>Facility admin</strong><small>Administrator</small></span><MoreHorizontal size={16} /></button>{profileOpen && <div className="profile-popover" data-testid="profile-popover"><button onClick={() => setToast("Account settings opened")} data-testid="account-settings-button"><Settings2 size={14} /> Account settings</button><Link to="/" data-testid="command-logout-link">Return to website</Link></div>}</div>
       </aside>
       <div className="command-content-shell">
-        <header className="command-topbar" data-testid="command-topbar"><div><span className="command-breadcrumb">FACILITY / <b>SHARMA STEEL ROLLING MILLS</b></span><h1>Good evening, Sharma Steel Mills</h1></div><div className="command-top-actions"><button className="demo-mode-chip" onClick={() => { setIsDemoMode((value) => !value); setToast(isDemoMode ? "Demo mode paused" : "Demo mode enabled"); }} data-testid="demo-mode-toggle"><span className="status-dot" /> {isDemoMode ? "Demo mode" : "Live preview"}</button><div className="command-search-wrap">{showSearch && <input autoFocus placeholder="Search facility data" onChange={(event) => setToast(event.target.value ? `Searching for ${event.target.value}` : "Search ready")} data-testid="command-search-input" />}<button className="command-icon-button" onClick={() => setShowSearch((value) => !value)} aria-label="Search" data-testid="command-search-button"><Search size={20} /></button></div><button className="command-icon-button notification-button" onClick={() => setShowNotifications((value) => !value)} aria-label="Notifications" data-testid="command-notifications-button"><Bell size={20} /><i /></button><button className="command-primary-button top-simulate-button" onClick={simulateSaving} data-testid="top-simulate-saving-button"><Zap size={16} /> Simulate saving</button><button className="command-warning-button" onClick={() => selectView("Alerts")} aria-label="Open alerts" data-testid="top-alerts-button"><AlertTriangle size={18} /></button></div>{showNotifications && <div className="notification-popover" data-testid="notification-popover"><span className="command-kicker">NOTIFICATIONS</span><strong>Line 2 compressor is above baseline</strong><small>Tap Alerts to investigate the recommended action.</small><button onClick={() => { setShowNotifications(false); selectView("Alerts"); }} data-testid="notification-open-alert-button">Open alert <ArrowRight size={14} /></button></div>}</header>
+        <header className="command-topbar" data-testid="command-topbar"><div><span className="command-breadcrumb">FACILITY / <b>SHARMA STEEL ROLLING MILLS</b></span><h1>Good evening, Sharma Steel Mills</h1></div><div className="command-top-actions"><button className="presenter-launch-button" onClick={startPresenterMode} data-testid="presenter-mode-button"><Play size={14} /> {presenterMode ? "Walkthrough active" : "Presenter mode"}</button><button className="demo-mode-chip" onClick={() => { setIsDemoMode((value) => !value); setToast(isDemoMode ? "Demo mode paused" : "Demo mode enabled"); }} data-testid="demo-mode-toggle"><span className="status-dot" /> {isDemoMode ? "Demo mode" : "Live preview"}</button><div className="command-search-wrap">{showSearch && <input autoFocus placeholder="Search facility data" onChange={(event) => setToast(event.target.value ? `Searching for ${event.target.value}` : "Search ready")} data-testid="command-search-input" />}<button className="command-icon-button" onClick={() => setShowSearch((value) => !value)} aria-label="Search" data-testid="command-search-button"><Search size={20} /></button></div><button className="command-icon-button notification-button" onClick={() => setShowNotifications((value) => !value)} aria-label="Notifications" data-testid="command-notifications-button"><Bell size={20} /><i /></button><button className={`command-primary-button top-simulate-button ${presenterMode && presenterStep === 1 ? "presenter-highlight" : ""}`} onClick={simulateSaving} data-testid="top-simulate-saving-button"><Zap size={16} /> Simulate saving</button><button className="command-warning-button" onClick={() => selectView("Alerts")} aria-label="Open alerts" data-testid="top-alerts-button"><AlertTriangle size={18} /></button></div>{showNotifications && <div className="notification-popover" data-testid="notification-popover"><span className="command-kicker">NOTIFICATIONS</span><strong>Line 2 compressor is above baseline</strong><small>Tap Alerts to investigate the recommended action.</small><button onClick={() => { setShowNotifications(false); selectView("Alerts"); }} data-testid="notification-open-alert-button">Open alert <ArrowRight size={14} /></button></div>}</header>
         <section className="command-main" data-testid="command-main-content"><div className="command-overview"><div><span className="command-kicker">OVERVIEW · 31 AUG 2026</span><h2>{activeView === "Dashboard" ? "Energy command center" : activeView}</h2><p>{activeView === "Dashboard" ? "Measure performance, catch waste and turn every verified saving into value." : "A live workspace for the Sharma Steel Rolling Mills demo facility."}</p></div><div className="sync-status"><span className="synced-chip"><CircleCheck size={14} /> {toast}</span><small>Last meter input · 08:42 IST</small></div></div>{renderWorkspace()}</section>
       </div>
+      {presenterMode && <aside className="presenter-guide" data-testid="presenter-guide"><div className="presenter-guide-top"><span>{presenterCard.label}</span><button onClick={() => setPresenterMode(false)} aria-label="Exit presenter mode" data-testid="presenter-exit-button"><X size={15} /></button></div><div className="presenter-progress"><span style={{ width: `${((presenterStep + 1) / presenterSteps.length) * 100}%` }} /></div><h3>{presenterCard.title}</h3><p>{presenterCard.copy}</p><div className="presenter-guide-actions"><span>{presenterStep + 1} of {presenterSteps.length}</span><button onClick={advancePresenter} data-testid="presenter-next-button">{presenterStep === presenterSteps.length - 1 ? "Finish walkthrough" : "Next moment"} <ArrowRight size={14} /></button></div></aside>}
     </main>
   );
 }

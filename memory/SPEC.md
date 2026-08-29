@@ -10,6 +10,7 @@ Single-page SIH 2026 concept website for URJA-CHAKRA (ऊर्जा चक्�
 - Green Wallet transaction history updates from verified savings and simulated marketplace buy/sell actions.
 - Solution loop, six method steps, architecture layers, AI signal modes and recommendation sorting are interactive.
 - Launch Demo opens a dedicated command-center screen at `/demo` with functional workspace navigation, telemetry range controls, simulate-saving action, alert investigation, machinery, target, improvement, wallet, marketplace, report and facility-profile views.
+- Presenter Mode auto-walks judges through the alert signal, saving simulation and verified UEC outcome with timed highlights and manual next/finish controls.
 
 ## Data model
 - Demo state: energySaved, uecEarned, walletUec, walletValue, improvementApplied.
