@@ -135,6 +135,8 @@ const initialTransactions: Transaction[] = [
   { title: "Verified Energy Saving", amount: "+24 UEC", date: "12 Jun · 11:08", positive: true },
 ];
 
+const EXACT_LOGO_URL = "https://customer-assets-wrfwihn1.emergentagent.net/job_verified-savings-app/artifacts/gmul3mcn_image.png";
+
 function formatLakhs(value: number) {
   return `₹${(value / 100000).toFixed(2)}L`;
 }
@@ -160,11 +162,9 @@ function LogoPlaceholder({ small = false }: { small?: boolean }) {
     <div className={`logo-placeholder ${small ? "logo-placeholder-small" : ""}`} data-testid={small ? "footer-logo-placeholder" : "hero-logo-placeholder"}>
       <div className="logo-placeholder-ring" />
       <div className="logo-placeholder-face">
-        <span className="logo-placeholder-kicker">ORIGINAL PDF LOGO</span>
-        <strong>URJA-CHAKRA</strong>
-        <span>ऊर्जा चक्र</span>
+        <img src={EXACT_LOGO_URL} alt="Exact URJA-CHAKRA logo supplied by the user" data-testid={small ? "footer-exact-logo" : "hero-exact-logo"} />
       </div>
-      <span className="logo-placeholder-note">asset placeholder</span>
+      <span className="logo-placeholder-note">supplied logo asset</span>
     </div>
   );
 }
