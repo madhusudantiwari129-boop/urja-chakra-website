@@ -141,12 +141,22 @@ const initialTransactions: Transaction[] = [
   { title: "Verified Energy Saving", amount: "+24 UEC", date: "12 Jun · 11:08", positive: true },
 ];
 
-const energyTips = [
-  "Switch off standby devices after operating hours.",
-  "Keep AC set points near 24°C to reduce avoidable cooling load.",
-  "Use natural lighting before switching on floor-wide fixtures.",
-  "Avoid unnecessary appliance and machinery usage during idle shifts.",
-  "Monitor peak-hour consumption before scheduling high-load equipment.",
+const tipCategories = ["Office", "Factory", "Campus", "Household"] as const;
+type TipCategory = (typeof tipCategories)[number];
+
+const energyTips: { category: TipCategory; text: string }[] = [
+  { category: "Office", text: "Switch off monitors, printers and standby devices after working hours." },
+  { category: "Office", text: "Keep AC set points near 24°C to reduce avoidable cooling load." },
+  { category: "Office", text: "Use daylight zones before switching on floor-wide lighting." },
+  { category: "Factory", text: "Stop idle machinery during off-shift and planned production gaps." },
+  { category: "Factory", text: "Schedule high-load equipment outside peak-demand windows where possible." },
+  { category: "Factory", text: "Inspect compressed-air lines regularly for silent energy leaks." },
+  { category: "Campus", text: "Match classroom lighting and cooling schedules to actual occupancy." },
+  { category: "Campus", text: "Use natural lighting in corridors, libraries and common areas." },
+  { category: "Campus", text: "Power down lab equipment and projectors after the final session." },
+  { category: "Household", text: "Switch off chargers and entertainment devices instead of leaving them on standby." },
+  { category: "Household", text: "Avoid running half-loaded washing machines and dishwashers." },
+  { category: "Household", text: "Monitor peak-hour consumption before using several heavy appliances together." },
 ];
 
 const heroFlowSteps = [
@@ -259,6 +269,7 @@ function Home() {
   const [aiMode, setAiMode] = useState(0);
   const [activeHeroFlow, setActiveHeroFlow] = useState(0);
   const [tipIndex, setTipIndex] = useState(0);
+  const [tipCategory, setTipCategory] = useState<TipCategory>("Factory");
   const [creditInput, setCreditInput] = useState("120");
   const [optimizedKwh, setOptimizedKwh] = useState(95);
   const [openFaq, setOpenFaq] = useState<number | null>(0);
@@ -274,6 +285,8 @@ function Home() {
   const progress = Math.min(100, Math.round((energySaved / 32000) * 100));
   const calculatorCredits = Math.max(0, Math.floor(Number(creditInput) || 0));
   const reductionPercentage = Math.round(((120 - optimizedKwh) / 120) * 100);
+  const filteredTips = energyTips.filter((tip) => tip.category === tipCategory);
+  const currentTip = filteredTips[tipIndex % filteredTips.length];
 
   const handleImprovement = () => {
     if (improvementApplied) return;
@@ -356,7 +369,7 @@ function Home() {
         </div>
         <div className="missing-link" data-testid="missing-link-callout"><div><span className="callout-label">The missing link</span><h3>A smaller electricity bill is not enough.</h3></div><p>A facility can save thousands of units of electricity and receive nothing beyond the bill. URJA-CHAKRA makes the invisible visible — then makes it valuable.</p></div>
         <div className="stat-strip" data-testid="problem-statistics"><div><strong>3 years</strong><span>typical verification cycle</span></div><div><strong>MSMEs</strong><span>outside the designated consumer net</span></div><div><strong>1,000 kWh</strong><span>to create 1 UEC</span></div><div><strong>24 / 7</strong><span>machine-aware monitoring</span></div></div>
-        <div className="daily-tip-card" data-testid="energy-tip-card"><span className="daily-tip-icon"><Lightbulb size={20} /></span><div><span className="mini-kicker">ENERGY SAVING TIP · {tipIndex + 1} / {energyTips.length}</span><strong>{energyTips[tipIndex]}</strong><small>Small operating habits can compound into measurable savings.</small></div><button onClick={() => setTipIndex((index) => (index + 1) % energyTips.length)} data-testid="next-energy-tip-button">Next Tip <ArrowRight size={14} /></button></div>
+        <div className="daily-tip-card" data-testid="energy-tip-card"><span className="daily-tip-icon"><Lightbulb size={20} /></span><div className="daily-tip-content"><span className="mini-kicker">{tipCategory.toUpperCase()} ENERGY TIP · {(tipIndex % filteredTips.length) + 1} / {filteredTips.length}</span><div className="tip-category-row" data-testid="tip-category-filters">{tipCategories.map((category) => <button className={tipCategory === category ? "active" : ""} onClick={() => { setTipCategory(category); setTipIndex(0); }} key={category} data-testid={`tip-category-${category.toLowerCase()}`}>{category}</button>)}</div><strong data-testid="active-energy-tip">{currentTip.text}</strong><small>Small operating habits can compound into measurable savings.</small></div><button onClick={() => setTipIndex((index) => (index + 1) % filteredTips.length)} data-testid="next-energy-tip-button">Next Tip <ArrowRight size={14} /></button></div>
       </section>
 
       <section id="solution" className="section-shell solution-section" data-testid="solution-section">
