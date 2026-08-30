@@ -10,6 +10,7 @@ Single-page SIH 2026 concept website for URJA-CHAKRA (ऊर्जा चक्�
 - Green Wallet transaction history updates from verified savings and simulated marketplace buy/sell actions.
 - Solution loop, six method steps, architecture layers, AI signal modes and recommendation sorting are interactive.
 - Launch Demo opens a dedicated command-center screen at `/demo` with functional workspace navigation, telemetry range controls, simulate-saving action, alert investigation, machinery, target, improvement, wallet, marketplace, report and facility-profile views.
+- The Alert Center includes a timed mock Line 2 compressor investigation side panel with load-vs-baseline trend, possible causes, recommendation reveal and a resolved state that updates the alert count to zero.
 - Presenter Mode auto-walks judges through the alert signal, saving simulation and verified UEC outcome with timed highlights and manual next/finish controls.
 - A persisted light/dark theme toggle is available in both the marketing header and command-center top bar; the chosen theme survives route navigation and reloads.
 - Lightweight marketing interactions include categorized rotating energy tips for Office, Factory, Campus and Household use, a prototype 1 kWh = 1 URJA Credit calculator, an adjustable before/after comparison, demo achievement badges, clickable hero energy-flow explanations, viewport-animated demo impact counters and a single-open FAQ accordion.

@@ -37,6 +37,7 @@ import {
   AreaChart,
   CartesianGrid,
   Line,
+  LineChart,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -46,6 +47,7 @@ import {
 const EXACT_LOGO_URL = "https://customer-assets-wrfwihn1.emergentagent.net/job_verified-savings-app/artifacts/w26ga0fs_image.png";
 
 type ViewName = "Dashboard" | "Machinery" | "Energy Targets" | "Improvements" | "Alerts" | "Credit Wallet" | "Marketplace" | "Reports" | "Facility Profile";
+type InvestigationStatus = "idle" | "running" | "complete";
 type IconType = typeof LayoutDashboard;
 
 interface NavItem {
@@ -89,6 +91,15 @@ const telemetry = [
   { day: "31 Aug", actual: 7.4, baseline: 8.4 },
 ];
 
+const compressorTrend = [
+  { time: "08:00", load: 44, baseline: 42 },
+  { time: "08:30", load: 48, baseline: 42 },
+  { time: "09:00", load: 55, baseline: 42 },
+  { time: "09:30", load: 62, baseline: 42 },
+  { time: "10:00", load: 71, baseline: 42 },
+  { time: "10:30", load: 76, baseline: 42 },
+];
+
 const machines = [
   { name: "Rolling Line 1", type: "Primary rolling mill", load: "84 kW", status: "Within baseline", tone: "ok" },
   { name: "Compressor Line 2", type: "Compressed air", load: "76 kW", status: "34% above baseline", tone: "alert" },
@@ -124,6 +135,9 @@ function Demo() {
   const [profileEditing, setProfileEditing] = useState(false);
   const [presenterMode, setPresenterMode] = useState(false);
   const [presenterStep, setPresenterStep] = useState(0);
+  const [investigationOpen, setInvestigationOpen] = useState(false);
+  const [investigationStatus, setInvestigationStatus] = useState<InvestigationStatus>("idle");
+  const [alertResolved, setAlertResolved] = useState(false);
 
   const dailyConsumption = simulated ? "4,112 kWh" : "4,508 kWh";
   const monthlyConsumption = simulated ? "121.6 MWh" : "126.8 MWh";
@@ -155,6 +169,34 @@ function Demo() {
     window.scrollTo({ top: 0, behavior: "smooth" });
     setToast(`${view} view opened`);
   };
+
+  const beginInvestigation = () => {
+    setActiveMachine("Compressor Line 2");
+    setInvestigationStatus("running");
+    setInvestigationOpen(true);
+    setToast("Mock compressor investigation started");
+  };
+
+  const closeInvestigation = () => {
+    setInvestigationOpen(false);
+    if (!alertResolved) setInvestigationStatus("idle");
+  };
+
+  const resolveInvestigation = () => {
+    setAlertResolved(true);
+    setInvestigationOpen(false);
+    setInvestigationStatus("complete");
+    setToast("Line 2 compressor issue marked resolved");
+  };
+
+  useEffect(() => {
+    if (investigationStatus !== "running") return;
+    const timer = window.setTimeout(() => {
+      setInvestigationStatus("complete");
+      setToast("Mock investigation complete · recommendation ready");
+    }, 1600);
+    return () => window.clearTimeout(timer);
+  }, [investigationStatus]);
 
   const startPresenterMode = () => {
     setPresenterStep(0);
@@ -225,7 +267,38 @@ function Demo() {
 
   const renderImprovements = () => <section className="command-view-panel" data-testid="improvements-view"><div className="view-heading"><div><span className="command-kicker">ACTION QUEUE</span><h3>Where can Sharma Steel save?</h3><p>Prioritised actions ranked by expected savings and payback.</p></div><button className="command-outline-button" onClick={() => setToast("Recommendation list refreshed")} data-testid="refresh-improvements-button"><Activity size={15} /> Refresh queue</button></div><div className="improvement-view-grid">{[{ title: "Compressed-Air Leak", saving: "9,100 kWh/yr", payback: "2 months", tone: "high" }, { title: "IE4 Motor Upgrade", saving: "18,400 kWh/yr", payback: "11 months", tone: "strategic" }, { title: "Off-Peak Furnace Preheat", saving: "6,750 kWh/yr", payback: "Immediate", tone: "quick" }].map((item, index) => <div className="improvement-view-card" key={item.title} data-testid={`improvement-view-card-${index}`}><span className={`improvement-label ${item.tone}`}>{item.tone === "quick" ? "Quick win" : item.tone === "high" ? "High impact" : "Strategic"}</span><h4>{item.title}</h4><strong>{item.saving}</strong><small>Estimated payback · {item.payback}</small><button onClick={simulateSaving} data-testid={`improvement-apply-${index}`}>Implement improvement <ArrowRight size={14} /></button></div>)}</div></section>;
 
-  const renderAlerts = () => <section className={`command-view-panel ${presenterMode && presenterStep === 0 ? "presenter-highlight" : ""}`} data-testid="alerts-view"><div className="view-heading"><div><span className="command-kicker">ALERT CENTER</span><h3>Signals that need attention</h3><p>Review exceptions before they become monthly surprises.</p></div><span className="alert-count-chip"><CircleAlert size={14} /> 1 open alert</span></div><div className="alert-detail-card"><div className="alert-detail-icon"><AlertTriangle size={22} /></div><div><span className="command-kicker">HIGH PRIORITY · LINE 2</span><h4>Compressor drawing 34% above baseline</h4><p>Potential compressed-air leak detected from machine-aware comparison. Current load 76 kW vs expected load 42 kW.</p><div className="alert-detail-actions"><button onClick={() => { setActiveMachine("Compressor Line 2"); setToast("Compressor Line 2 investigation opened"); }} data-testid="alert-investigate-button">Investigate machine <ArrowRight size={14} /></button><button className="command-text-button" onClick={() => { setToast("Alert marked as reviewed"); selectView("Dashboard"); }} data-testid="alert-resolve-button">Mark reviewed <Check size={14} /></button></div></div></div></section>;
+  const renderAlerts = () => (
+    <section className={`command-view-panel ${presenterMode && presenterStep === 0 ? "presenter-highlight" : ""} ${alertResolved ? "alert-view-resolved" : ""}`} data-testid="alerts-view">
+      <div className="view-heading">
+        <div><span className="command-kicker">ALERT CENTER</span><h3>Signals that need attention</h3><p>Review exceptions before they become monthly surprises.</p></div>
+        <span className={`alert-count-chip ${alertResolved ? "resolved" : ""}`} data-testid="open-alert-count">{alertResolved ? <CircleCheck size={14} /> : <CircleAlert size={14} />} {alertResolved ? "0 open alerts" : "1 open alert"}</span>
+      </div>
+      <div className={`alert-detail-card ${alertResolved ? "resolved" : ""}`} data-testid="compressor-alert-card">
+        <div className="alert-detail-icon">{alertResolved ? <CircleCheck size={22} /> : <AlertTriangle size={22} />}</div>
+        <div>
+          <span className="command-kicker">{alertResolved ? "RESOLVED · LINE 2" : "HIGH PRIORITY · LINE 2"}</span>
+          <h4>{alertResolved ? "Compressor issue marked resolved" : "Compressor drawing 34% above baseline"}</h4>
+          <p>{alertResolved ? "The mock investigation workflow is complete. Continue monitoring Line 2 against its 42 kW baseline." : "Potential compressed-air leak detected from machine-aware comparison. Current load 76 kW vs expected load 42 kW."}</p>
+          <div className="alert-detail-actions">
+            {alertResolved ? <span className="resolved-action" data-testid="alert-resolved-label">Resolved <Check size={14} /></span> : <button onClick={beginInvestigation} data-testid="alert-investigate-button">Investigate machine <ArrowRight size={14} /></button>}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+
+  const renderInvestigationPanel = () => (
+    <div className="investigation-overlay" role="presentation" data-testid="investigation-overlay">
+      <aside className="machine-investigation-panel" role="dialog" aria-modal="true" aria-labelledby="investigation-title" data-testid="investigation-panel">
+        <div className="investigation-panel-head"><div><span className="command-kicker">MOCK INVESTIGATION · LINE 2</span><h2 id="investigation-title">Compressor</h2><p>Simulated analysis only · no live IoT connection</p></div><button onClick={closeInvestigation} aria-label="Close investigation" data-testid="investigation-close-button"><X size={18} /></button></div>
+        <div className={`investigation-status-pill ${investigationStatus}`} data-testid="investigation-status">{investigationStatus === "running" ? <><span className="investigation-spinner" /> Investigation in progress</> : <><CircleCheck size={15} /> Investigation complete</>}</div>
+        <div className="investigation-metrics" data-testid="investigation-metrics"><div><span>Current load</span><strong>76 kW</strong></div><div><span>Expected load</span><strong>42 kW</strong></div><div><span>Deviation</span><strong>+34 kW</strong></div></div>
+        <section className="investigation-chart-card" data-testid="investigation-trend-chart"><div><span className="command-kicker">RECENT ENERGY TREND</span><strong>Load rising above baseline</strong></div><div className="investigation-chart"><ResponsiveContainer width="100%" height="100%"><LineChart data={compressorTrend} margin={{ top: 10, right: 8, left: -28, bottom: 0 }}><CartesianGrid stroke="#dce7e2" strokeDasharray="3 3" vertical={false} /><XAxis dataKey="time" tick={{ fill: "#81938b", fontSize: 9 }} axisLine={false} tickLine={false} /><YAxis tick={{ fill: "#81938b", fontSize: 9 }} axisLine={false} tickLine={false} /><Tooltip contentStyle={{ borderRadius: 8, border: "1px solid #d8e6e0", fontSize: 10 }} /><Line type="monotone" dataKey="baseline" stroke="#8ca198" strokeDasharray="5 5" strokeWidth={2} dot={false} /><Line type="monotone" dataKey="load" stroke="#df6659" strokeWidth={3} dot={{ r: 2, fill: "#df6659" }} animationDuration={900} /></LineChart></ResponsiveContainer></div><div className="investigation-chart-legend"><span><i className="baseline" /> Expected baseline</span><span><i className="actual" /> Compressor load</span></div></section>
+        <section className="possible-causes" data-testid="possible-causes"><span className="command-kicker">POSSIBLE CAUSES</span><ul><li><AlertTriangle size={14} /> Possible compressed-air leakage</li><li><Activity size={14} /> Excessive operating load</li><li><Settings2 size={14} /> Maintenance/efficiency issue</li></ul></section>
+        {investigationStatus === "running" ? <div className="investigation-progress" data-testid="investigation-progress"><span>Analyzing load variance and operating context…</span><i><b /></i></div> : <div className="investigation-recommendation" data-testid="investigation-recommendation"><span className="command-kicker">RECOMMENDED ACTION</span><strong>Inspect compressor air lines, pressure settings and machine efficiency.</strong><button onClick={resolveInvestigation} data-testid="mark-issue-resolved-button"><Check size={15} /> Mark issue resolved</button></div>}
+      </aside>
+    </div>
+  );
 
   const renderWallet = () => <section className="command-view-panel" data-testid="wallet-view"><div className="view-heading"><div><span className="command-kicker">CREDIT WALLET</span><h3>Green capital, ready to reinvest.</h3><p>Verified savings and credit trades settle into one facility balance.</p></div><button className="command-outline-button" onClick={() => selectView("Marketplace")} data-testid="wallet-open-marketplace-button"><ShoppingCart size={15} /> Open marketplace</button></div><div className="wallet-view-grid"><div className="wallet-view-balance"><span>GREEN CAPEX BALANCE</span><strong>{formatLakhs(walletBalance)}</strong><small>{walletUec} UEC available</small><button onClick={simulateSaving} data-testid="wallet-verify-saving-button">Verify next saving <ArrowUpRight size={14} /></button></div><div className="wallet-view-history"><span className="command-kicker">RECENT ACTIVITY</span>{walletTransactions.map((transaction, index) => <div className="wallet-view-row" key={`${transaction.title}-${index}`} data-testid={`wallet-activity-${index}`}><span className={transaction.positive ? "wallet-arrow positive" : "wallet-arrow negative"}>{transaction.positive ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}</span><span><strong>{transaction.title}</strong><small>{transaction.meta}</small></span><b className={transaction.positive ? "positive-text" : "negative-text"}>{transaction.amount}</b></div>)}</div></div></section>;
 
@@ -254,13 +327,14 @@ function Demo() {
       <aside className="command-sidebar" data-testid="command-sidebar">
         <Link to="/" className="command-brand" data-testid="command-brand-home"><span className="command-brand-logo"><img src={EXACT_LOGO_URL} alt="URJA-CHAKRA logo" /></span><span><strong>URJA-CHAKRA</strong><small>ऊर्जा चक्र · OFFICIAL LOGO</small></span></Link>
         <span className="sidebar-section-label">WORKSPACE</span>
-        <nav className="command-nav" data-testid="command-navigation">{navItems.map((item) => { const NavIcon = item.icon; return <button className={activeView === item.label ? "active" : ""} onClick={() => selectView(item.label)} key={item.label} data-testid={`command-nav-${item.label.toLowerCase().replaceAll(" ", "-")}`}><NavIcon size={18} /><span>{item.label}</span>{item.badge && <b>{item.badge}</b>}</button>; })}</nav>
+        <nav className="command-nav" data-testid="command-navigation">{navItems.map((item) => { const NavIcon = item.icon; const navBadge = item.label === "Alerts" ? (alertResolved ? "0" : "1") : item.badge; return <button className={activeView === item.label ? "active" : ""} onClick={() => selectView(item.label)} key={item.label} data-testid={`command-nav-${item.label.toLowerCase().replaceAll(" ", "-")}`}><NavIcon size={18} /><span>{item.label}</span>{navBadge && <b className={alertResolved && item.label === "Alerts" ? "resolved" : ""}>{navBadge}</b>}</button>; })}</nav>
         <div className="sidebar-bottom"><button className="command-facility-switcher" onClick={() => setToast("Facility switcher opened")} data-testid="facility-switcher"><span className="facility-switcher-icon"><Building2 size={18} /></span><span><strong>Sharma Steel</strong><small>UDYAM-RJ-17-0043291</small></span><MoreHorizontal size={16} /></button><button className="command-profile" onClick={() => setProfileOpen((value) => !value)} data-testid="command-profile-menu"><span className="profile-avatar">SS</span><span><strong>Facility admin</strong><small>Administrator</small></span><MoreHorizontal size={16} /></button>{profileOpen && <div className="profile-popover" data-testid="profile-popover"><button onClick={() => setToast("Account settings opened")} data-testid="account-settings-button"><Settings2 size={14} /> Account settings</button><Link to="/" data-testid="command-logout-link">Return to website</Link></div>}</div>
       </aside>
       <div className="command-content-shell">
-        <header className="command-topbar" data-testid="command-topbar"><div><span className="command-breadcrumb">FACILITY / <b>SHARMA STEEL ROLLING MILLS</b></span><h1>Good evening, Sharma Steel Mills</h1></div><div className="command-top-actions"><button className="presenter-launch-button" onClick={startPresenterMode} data-testid="presenter-mode-button"><Play size={14} /> {presenterMode ? "Walkthrough active" : "Presenter mode"}</button><button className="demo-theme-toggle" onClick={toggleTheme} aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`} title={`Switch to ${theme === "dark" ? "light" : "dark"} mode`} data-testid="demo-theme-toggle">{theme === "dark" ? <Sun size={15} /> : <Moon size={15} />}<span>{theme === "dark" ? "Light" : "Dark"}</span></button><button className="demo-mode-chip" onClick={() => { setIsDemoMode((value) => !value); setToast(isDemoMode ? "Demo mode paused" : "Demo mode enabled"); }} data-testid="demo-mode-toggle"><span className="status-dot" /> {isDemoMode ? "Demo mode" : "Live preview"}</button><div className="command-search-wrap">{showSearch && <input autoFocus placeholder="Search facility data" onChange={(event) => setToast(event.target.value ? `Searching for ${event.target.value}` : "Search ready")} data-testid="command-search-input" />}<button className="command-icon-button" onClick={() => setShowSearch((value) => !value)} aria-label="Search" data-testid="command-search-button"><Search size={20} /></button></div><button className="command-icon-button notification-button" onClick={() => setShowNotifications((value) => !value)} aria-label="Notifications" data-testid="command-notifications-button"><Bell size={20} /><i /></button><button className={`command-primary-button top-simulate-button ${presenterMode && presenterStep === 1 ? "presenter-highlight" : ""}`} onClick={simulateSaving} data-testid="top-simulate-saving-button"><Zap size={16} /> Simulate saving</button><button className="command-warning-button" onClick={() => selectView("Alerts")} aria-label="Open alerts" data-testid="top-alerts-button"><AlertTriangle size={18} /></button></div>{showNotifications && <div className="notification-popover" data-testid="notification-popover"><span className="command-kicker">NOTIFICATIONS</span><strong>Line 2 compressor is above baseline</strong><small>Tap Alerts to investigate the recommended action.</small><button onClick={() => { setShowNotifications(false); selectView("Alerts"); }} data-testid="notification-open-alert-button">Open alert <ArrowRight size={14} /></button></div>}</header>
+        <header className="command-topbar" data-testid="command-topbar"><div><span className="command-breadcrumb">FACILITY / <b>SHARMA STEEL ROLLING MILLS</b></span><h1>Good evening, Sharma Steel Mills</h1></div><div className="command-top-actions"><button className="presenter-launch-button" onClick={startPresenterMode} data-testid="presenter-mode-button"><Play size={14} /> {presenterMode ? "Walkthrough active" : "Presenter mode"}</button><button className="demo-theme-toggle" onClick={toggleTheme} aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`} title={`Switch to ${theme === "dark" ? "light" : "dark"} mode`} data-testid="demo-theme-toggle">{theme === "dark" ? <Sun size={15} /> : <Moon size={15} />}<span>{theme === "dark" ? "Light" : "Dark"}</span></button><button className="demo-mode-chip" onClick={() => { setIsDemoMode((value) => !value); setToast(isDemoMode ? "Demo mode paused" : "Demo mode enabled"); }} data-testid="demo-mode-toggle"><span className="status-dot" /> {isDemoMode ? "Demo mode" : "Live preview"}</button><div className="command-search-wrap">{showSearch && <input autoFocus placeholder="Search facility data" onChange={(event) => setToast(event.target.value ? `Searching for ${event.target.value}` : "Search ready")} data-testid="command-search-input" />}<button className="command-icon-button" onClick={() => setShowSearch((value) => !value)} aria-label="Search" data-testid="command-search-button"><Search size={20} /></button></div><button className="command-icon-button notification-button" onClick={() => setShowNotifications((value) => !value)} aria-label="Notifications" data-testid="command-notifications-button"><Bell size={20} />{!alertResolved && <i />}</button><button className={`command-primary-button top-simulate-button ${presenterMode && presenterStep === 1 ? "presenter-highlight" : ""}`} onClick={simulateSaving} data-testid="top-simulate-saving-button"><Zap size={16} /> Simulate saving</button><button className={alertResolved ? "command-warning-button resolved" : "command-warning-button"} onClick={() => selectView("Alerts")} aria-label="Open alerts" data-testid="top-alerts-button">{alertResolved ? <CircleCheck size={18} /> : <AlertTriangle size={18} />}</button></div>{showNotifications && <div className="notification-popover" data-testid="notification-popover"><span className="command-kicker">NOTIFICATIONS</span><strong>{alertResolved ? "No open alerts" : "Line 2 compressor is above baseline"}</strong><small>{alertResolved ? "The Line 2 mock investigation was marked resolved." : "Tap Alerts to investigate the recommended action."}</small>{!alertResolved && <button onClick={() => { setShowNotifications(false); selectView("Alerts"); }} data-testid="notification-open-alert-button">Open alert <ArrowRight size={14} /></button>}</div>}</header>
         <section className="command-main" data-testid="command-main-content"><div className="command-overview"><div><span className="command-kicker">OVERVIEW · 31 AUG 2026</span><h2>{activeView === "Dashboard" ? "Energy command center" : activeView}</h2><p>{activeView === "Dashboard" ? "Measure performance, catch waste and turn every verified saving into value." : "A live workspace for the Sharma Steel Rolling Mills demo facility."}</p></div><div className="sync-status"><span className="synced-chip"><CircleCheck size={14} /> {toast}</span><small>Last meter input · 08:42 IST</small></div></div>{renderWorkspace()}</section>
       </div>
+      {investigationOpen && renderInvestigationPanel()}
       {presenterMode && <aside className="presenter-guide" data-testid="presenter-guide"><div className="presenter-guide-top"><span>{presenterCard.label}</span><button onClick={() => setPresenterMode(false)} aria-label="Exit presenter mode" data-testid="presenter-exit-button"><X size={15} /></button></div><div className="presenter-progress"><span style={{ width: `${((presenterStep + 1) / presenterSteps.length) * 100}%` }} /></div><h3>{presenterCard.title}</h3><p>{presenterCard.copy}</p><div className="presenter-guide-actions"><span>{presenterStep + 1} of {presenterSteps.length}</span><button onClick={advancePresenter} data-testid="presenter-next-button">{presenterStep === presenterSteps.length - 1 ? "Finish walkthrough" : "Next moment"} <ArrowRight size={14} /></button></div></aside>}
     </main>
   );
