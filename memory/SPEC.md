@@ -12,6 +12,7 @@ Single-page SIH 2026 concept website for URJA-CHAKRA (ऊर्जा चक्�
 - Launch Demo opens a dedicated command-center screen at `/demo` with functional workspace navigation, telemetry range controls, simulate-saving action, alert investigation, machinery, target, improvement, wallet, marketplace, report and facility-profile views.
 - Presenter Mode auto-walks judges through the alert signal, saving simulation and verified UEC outcome with timed highlights and manual next/finish controls.
 - A persisted light/dark theme toggle is available in both the marketing header and command-center top bar; the chosen theme survives route navigation and reloads.
+- Lightweight marketing interactions include five rotating energy tips, a prototype 1 kWh = 1 URJA Credit calculator, an adjustable before/after comparison, demo achievement badges, clickable hero energy-flow explanations, viewport-animated demo impact counters and a single-open FAQ accordion.
 
 ## Data model
 - Demo state: energySaved, uecEarned, walletUec, walletValue, improvementApplied.
