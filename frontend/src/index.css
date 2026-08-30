@@ -54,7 +54,8 @@ button { cursor: pointer; }
 .brand-lockup > span:last-child { display: grid; gap: 1px; }
 .brand-lockup strong { font: 700 13px/1 "Outfit Variable", sans-serif; letter-spacing: .13em; }
 .brand-lockup small { color: #628076; font-size: 10px; letter-spacing: .14em; }
-.brand-mark { display: grid; place-items: center; width: 31px; height: 31px; color: white; border-radius: 10px; background: #0d9f6d; box-shadow: 0 5px 15px rgba(15,159,110,.28); }
+.brand-mark { display: grid; place-items: center; overflow: hidden; width: 34px; height: 34px; border: 1px solid rgba(15,159,110,.42); border-radius: 50%; background: #102a46; box-shadow: 0 5px 15px rgba(15,159,110,.24); }
+.brand-mark img { display: block; width: 100%; height: 100%; border-radius: 50%; object-fit: cover; transform: scale(1.2); }
 .site-nav { display: flex; align-items: center; gap: 21px; }
 .site-nav a { color: #46655a; font-size: 12px; font-weight: 500; text-decoration: none; transition: color .2s ease; }
 .site-nav a:hover { color: #079264; }

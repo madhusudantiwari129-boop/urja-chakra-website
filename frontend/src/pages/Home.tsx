@@ -229,7 +229,7 @@ function Home() {
     <main className="min-h-screen overflow-hidden bg-[#f7faf8] text-slate-950" data-testid="urja-chakra-website">
       <header className="site-header" data-testid="sticky-navigation">
         <a href="#home" className="brand-lockup" data-testid="brand-home-link" onClick={() => setMenuOpen(false)}>
-          <span className="brand-mark"><Zap size={15} strokeWidth={2.5} /></span>
+          <span className="brand-mark"><img src={EXACT_LOGO_URL} alt="URJA-CHAKRA logo" data-testid="header-exact-logo" /></span>
           <span><strong>URJA-CHAKRA</strong><small>ऊर्जा चक्र</small></span>
         </a>
         <nav className={menuOpen ? "site-nav site-nav-open" : "site-nav"} data-testid="primary-navigation">

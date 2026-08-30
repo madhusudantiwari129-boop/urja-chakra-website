@@ -22,4 +22,4 @@ Single-page SIH 2026 concept website for URJA-CHAKRA (ऊर्जा चक्�
 No authentication, external API, government API, IoT connection or API key is required. All product data is MOCK/DEMO data held in React state.
 
 ## Branding note
-The exact supplied PNG logo asset is used in the hero and footer. It is placed inside a subtle 3D rotating frame; the image itself is not redrawn, retyped or proportionally altered.
+The exact supplied PNG logo asset is used in the marketing header, hero, command-center sidebar and footer. It is placed inside circular frames and a subtle 3D rotating hero treatment; the image itself is not redrawn, retyped or proportionally altered.
