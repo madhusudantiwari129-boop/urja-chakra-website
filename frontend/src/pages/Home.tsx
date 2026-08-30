@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTheme } from "@/hooks/useTheme";
 import {
   Activity,
   ArrowDownRight,
@@ -18,11 +19,13 @@ import {
   Leaf,
   LineChart as LineChartIcon,
   Menu,
+  Moon,
   MoveUpRight,
   Network,
   Search,
   ShieldCheck,
   Sparkles,
+  Sun,
   Target,
   TrendingDown,
   TrendingUp,
@@ -172,6 +175,7 @@ function LogoPlaceholder({ small = false }: { small?: boolean }) {
 
 function Home() {
   const navigate = useNavigate();
+  const { theme, toggleTheme } = useTheme();
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeStep, setActiveStep] = useState(0);
   const [activeFlow, setActiveFlow] = useState(0);
@@ -235,7 +239,7 @@ function Home() {
           })}
           <Button className="header-demo-button" onClick={() => { navigate("/demo"); setMenuOpen(false); }} data-testid="header-launch-demo-button">Launch Demo <ArrowRight size={15} /></Button>
         </nav>
-        <Button variant="ghost" size="icon" className="mobile-menu-button" onClick={() => setMenuOpen((open) => !open)} aria-label="Toggle navigation" data-testid="mobile-menu-toggle">{menuOpen ? <X /> : <Menu />}</Button>
+        <div className="header-utility-actions"><button className="theme-toggle-button" onClick={toggleTheme} aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`} title={`Switch to ${theme === "dark" ? "light" : "dark"} mode`} data-testid="website-theme-toggle">{theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}<span>{theme === "dark" ? "Light" : "Dark"}</span></button><Button variant="ghost" size="icon" className="mobile-menu-button" onClick={() => setMenuOpen((open) => !open)} aria-label="Toggle navigation" data-testid="mobile-menu-toggle">{menuOpen ? <X /> : <Menu />}</Button></div>
       </header>
 
       <section id="home" className="hero-section" data-testid="hero-section">
